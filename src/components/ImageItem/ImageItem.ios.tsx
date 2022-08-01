@@ -80,6 +80,9 @@ const ImageItem = ({
       const velocityY = nativeEvent?.velocity?.y ?? 0;
       const scaled = nativeEvent?.zoomScale > 1;
 
+      console.log("additional logging ")
+      console.log(velocityY)
+      
       onZoom(scaled);
       setScaled(scaled);
 
