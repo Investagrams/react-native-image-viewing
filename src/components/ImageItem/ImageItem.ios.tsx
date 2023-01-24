@@ -27,8 +27,8 @@ import { getImageStyles, getImageTransform } from "../../utils";
 import { ImageSource } from "../../@types";
 import { ImageLoading } from "./ImageLoading";
 
-const SWIPE_CLOSE_OFFSET = 75;
-const SWIPE_CLOSE_VELOCITY = 1.55;
+const SWIPE_CLOSE_OFFSET = 15;
+const SWIPE_CLOSE_VELOCITY = 1;
 const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
@@ -40,6 +40,8 @@ type Props = {
   onLongPress: (image: ImageSource) => void;
   delayLongPress: number;
   swipeToCloseEnabled?: boolean;
+  swipeVelocity?: number;
+  swipeOffset?: number;
   doubleTapToZoomEnabled?: boolean;
 };
 
@@ -50,6 +52,8 @@ const ImageItem = ({
   onLongPress,
   delayLongPress,
   swipeToCloseEnabled = true,
+  swipeVelocity,
+  swipeOffset,
   doubleTapToZoomEnabled = true,
 }: Props) => {
   const scrollViewRef = useRef<ScrollView>(null);
@@ -64,8 +68,10 @@ const ImageItem = ({
   const translateValue = new Animated.ValueXY(translate);
   const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
 
+  const swipeCloseOffsetThreshold = swipeOffset || SWIPE_CLOSE_OFFSET;
+  const swipeCloseVelocityThreshold = swipeVelocity || SWIPE_CLOSE_VELOCITY;
   const imageOpacity = scrollValueY.interpolate({
-    inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
+    inputRange: [-swipeCloseOffsetThreshold, 0, swipeCloseOffsetThreshold],
     outputRange: [0.5, 1, 0.5],
   });
   const imagesStyles = getImageStyles(
@@ -86,7 +92,7 @@ const ImageItem = ({
       if (
         !scaled &&
         swipeToCloseEnabled &&
-        Math.abs(velocityY) > SWIPE_CLOSE_OFFSET
+        Math.abs(velocityY) > swipeCloseOffsetThreshold
       ) {
         onRequestClose();
       }
